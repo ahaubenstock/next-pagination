@@ -1,6 +1,7 @@
 import users from "../../users.json";
 import classnames from "classnames";
 import Pagination from "./Pagination";
+import Filter from "./Filter";
 
 async function getUsers(page: number, pageSize: number, filter: string) {
   await new Promise((resolve) =>
@@ -8,7 +9,11 @@ async function getUsers(page: number, pageSize: number, filter: string) {
   );
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
-  return users.filter(({ id }) => id.includes(filter)).slice(start, end);
+  const filteredUsers = users.filter(({ id }) => id.includes(filter));
+  return {
+    users: filteredUsers.slice(start, end),
+    numberOfPages: Math.ceil(filteredUsers.length / pageSize),
+  };
 }
 
 export default async function Page({
@@ -20,14 +25,18 @@ export default async function Page({
     filter: string;
   };
 }) {
-  const users = await getUsers(+page, +pageSize, filter);
+  const { users, numberOfPages } = await getUsers(+page, +pageSize, filter);
   const noUsersHidden = 0 < users.length;
-
   return (
     <table className="table-auto shadow-md rounded-sm bg-white w-[500px]">
       <thead>
         <tr>
-          <th className="text-left p-4">User ID</th>
+          <th className="flex p-4">
+            <Filter />
+          </th>
+        </tr>
+        <tr>
+          <th className="text-left p-4 border-t border-t-slate-400">User ID</th>
         </tr>
       </thead>
       <tbody>
@@ -49,7 +58,7 @@ export default async function Page({
       <tfoot>
         <tr>
           <td className="p-4 flex justify-end border-t border-t-slate-400">
-            <Pagination />
+            <Pagination numberOfPages={numberOfPages} />
           </td>
         </tr>
       </tfoot>
