@@ -9,7 +9,9 @@ export default function Layout({ children }: PropsWithChildren) {
         <title>Pagination</title>
       </head>
       <body>
-        <main>{children}</main>
+        <main className="h-screen w-screen p-10 flex justify-center items-center bg-orange-50">
+          {children}
+        </main>
       </body>
     </html>
   );
